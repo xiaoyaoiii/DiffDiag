@@ -1,0 +1,67 @@
+{
+  "mode": "all",
+  "seed": 42,
+  "paths": {
+    "model_name_or_path": "/path/to/llm/model",
+    "data_root": "../data/processed_data/disease_data",
+    "dataset_name": "GMD",
+    "turn_data_file": "../data/processed_data/disease_data/turn_data/GMD_train_turn.json",
+    "test_data_file": "../data/processed_data/disease_data/GMD/test.json",
+    "disease_corpus_file": "../data/processed_data/disease_data/GMD/disease_corpurs.txt",
+    "feature_dir": "../re/probe_features/GMD",
+    "probe_dir": "../re/probe_models/GMD",
+    "test_output_file": "../re/probe_models/GMD/disease_predictions_test.jsonl"
+  },
+  "split": {
+    "val_ratio": 0.1,
+    "test_ratio": 0.0
+  },
+  "prompt": {
+    "symptom_source": "current",
+    "disease_set_source": "all",
+    "system_prompt": "",
+    "user_template": "## 患者临床表现\n- 阳性症状：{positive_symptoms}。\n- 阴性症状：{negative_symptoms}。\n\n## 候选疾病\n{疾病集合}\n\n请结合患者的阳性与阴性症状，在候选疾病中选择最可能的诊断。请仅输出疾病名称，不要输出其他内容。"
+  },
+  "extract": {
+    "device": "cuda",
+    "torch_dtype": "bf16",
+    "use_4bit": false,
+    "device_map": null,
+    "max_length": 2048,
+    "batch_size": 16,
+    "pooling": "mean",
+    "layer_indices": [-1, -2, -3, -4],
+    "normalize": true,
+    "add_generation_prompt": true,
+    "padding_side": "left",
+    "splits": ["train", "val", "test"],
+    "resume": true
+  },
+  "pca": {
+    "enabled": true,
+    "n_components": 512,
+    "whiten": false
+  },
+  "probe": {
+    "type": "linear",
+    "hidden_dim": 512,
+    "dropout": 0.1,
+    "lr": 0.01,
+    "weight_decay": 0.01,
+    "batch_size": 64,
+    "epochs": 500,
+    "patience": 500,
+    "class_weight": "auto",
+    "select_metric": "macro_f1",
+    "topk": [1],
+    "temperature": 1.0,
+    "max_grad_norm": 5.0
+  },
+  "test": {
+    "split": "test",
+    "symptoms_key": "all_symptoms",
+    "top_k": 5,
+    "save_all_probabilities": true,
+    "max_test_samples": -1
+  }
+}
